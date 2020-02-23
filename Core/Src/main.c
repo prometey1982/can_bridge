@@ -92,19 +92,22 @@ int main(void)
   MX_CAN_Init();
   /* USER CODE BEGIN 2 */
 
+#define RCC_APB2Periph_GPIOC             ((uint32_t)0x00000010)
+
   /* USER CODE END 2 */
  
- 
-
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
-  while (1)
-  {
-    /* USER CODE END WHILE */
-
-    /* USER CODE BEGIN 3 */
-  }
-  /* USER CODE END 3 */
+	RCC->APB2ENR |= RCC_APB2Periph_GPIOC; // включаем тактирование порта
+	GPIOC->CRH |= (0x3 << 20); // ставим частоту 50 МГц
+	GPIOC->CRH &= (~(0xC << 20)); // переводим ногу в режим выхода тяни-толкай
+	volatile long i = 0;
+	while(1)
+	{
+		GPIOC->BSRR = GPIO_BSRR_BR13;
+		for(i = 0; i < 1000*1000; i++){;};
+		GPIOC->BSRR = GPIO_BSRR_BS13;
+		for(i = 0; i < 1000*1000; i++){;};
+		printf("blink\n");
+	}
 }
 
 /**
