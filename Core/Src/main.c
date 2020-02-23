@@ -96,18 +96,24 @@ int main(void)
 
   /* USER CODE END 2 */
  
-	RCC->APB2ENR |= RCC_APB2Periph_GPIOC; // включаем тактирование порта
-	GPIOC->CRH |= (0x3 << 20); // ставим частоту 50 МГц
-	GPIOC->CRH &= (~(0xC << 20)); // переводим ногу в режим выхода тяни-толкай
-	volatile long i = 0;
-	while(1)
-	{
-		GPIOC->BSRR = GPIO_BSRR_BR13;
-		for(i = 0; i < 1000*1000; i++){;};
-		GPIOC->BSRR = GPIO_BSRR_BS13;
-		for(i = 0; i < 1000*1000; i++){;};
-		printf("blink\n");
-	}
+ 
+
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
+  RCC->APB2ENR |= RCC_APB2Periph_GPIOC; // РІРєР»СЋС‡Р°РµРј С‚Р°РєС‚РёСЂРѕРІР°РЅРёРµ РїРѕСЂС‚Р°
+  GPIOC->CRH |= (0x3 << 20); // СЃС‚Р°РІРёРј С‡Р°СЃС‚РѕС‚Сѓ 50 РњР“С†
+  volatile long i = 0;
+  while (1)
+  {
+	  GPIOC->BSRR = GPIO_BSRR_BR13;
+	  for(i = 0; i < 1000*1000; i++){;};
+	  GPIOC->BSRR = GPIO_BSRR_BS13;
+	  for(i = 0; i < 1000*1000; i++){;};
+    /* USER CODE END WHILE */
+
+    /* USER CODE BEGIN 3 */
+  }
+  /* USER CODE END 3 */
 }
 
 /**
@@ -121,12 +127,13 @@ void SystemClock_Config(void)
 
   /** Initializes the CPU, AHB and APB busses clocks 
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+  RCC_OscInitStruct.HSEPredivValue = RCC_HSE_PREDIV_DIV1;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI_DIV2;
-  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL16;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL9;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     Error_Handler();
@@ -162,11 +169,11 @@ static void MX_CAN_Init(void)
 
   /* USER CODE END CAN_Init 1 */
   hcan.Instance = CAN1;
-  hcan.Init.Prescaler = 16;
+  hcan.Init.Prescaler = 4;
   hcan.Init.Mode = CAN_MODE_NORMAL;
   hcan.Init.SyncJumpWidth = CAN_SJW_1TQ;
-  hcan.Init.TimeSeg1 = CAN_BS1_1TQ;
-  hcan.Init.TimeSeg2 = CAN_BS2_1TQ;
+  hcan.Init.TimeSeg1 = CAN_BS1_15TQ;
+  hcan.Init.TimeSeg2 = CAN_BS2_2TQ;
   hcan.Init.TimeTriggeredMode = DISABLE;
   hcan.Init.AutoBusOff = DISABLE;
   hcan.Init.AutoWakeUp = DISABLE;
@@ -192,6 +199,7 @@ static void MX_GPIO_Init(void)
 {
 
   /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
 }
